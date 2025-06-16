@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: signala-client
+    env: node
+    rootDir: client
+    buildCommand: npm install && npm run build
+    startCommand: npm run preview -- --port $PORT
+    envVars:
+      - key: NODE_ENV
+        value: development
