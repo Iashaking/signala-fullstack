@@ -19,6 +19,11 @@ export default defineConfig({
     fs: {
       strict: true,
       deny: ["**/.*"],
-    },
   },
+  preview: {
+    host: true,
+    port: parseInt(process.env.PORT || "4173"),
+    strictPort: true,
+    allowedHosts: ["signala-fullstack.onrender.com"]
+  }
 });
