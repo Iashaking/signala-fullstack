@@ -19,6 +19,7 @@ export default defineConfig({
     fs: {
       strict: true,
       deny: ["**/.*"],
+    }
   },
   preview: {
     host: true,
