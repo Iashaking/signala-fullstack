@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client";
-import App from "./App/Component";
+import App from "./AppComponent";
 import "./index.css";
 
 console.log("🔥 main.tsx loaded at", new Date());
