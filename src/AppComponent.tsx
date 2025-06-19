@@ -81,9 +81,20 @@ function AppComponent() {
           <Route path="/email-confirmation" component={EmailConfirmationPage} />
 
           {/* Redirect root to /search when authenticated */}
-          {isAuthenticated && (
-            <Route path="/" component={() => <Redirect to="/search" />} />
-          )}
+          {isAuthenticated ? (
+  <>
+    <Route path="/" component={() => <Redirect to="/search" />} />
+
+    {/* Wrap these inside SearchProvider */}
+    <SearchProvider>
+      <Route path="/search" component={SearchPage} />
+      <Route path="/dashboard" component={Dashboard} />
+      {/* ...other routes */}
+    </SearchProvider>
+  </>
+) : (
+  /* public logic */
+)}
 
           {/* Protected routes */}
           {isAuthenticated && (
