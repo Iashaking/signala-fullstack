@@ -1,7 +1,5 @@
-// Temporary commit to force Render to rebuild
-
+// src/AppComponent.tsx
 import { Switch, Route, Redirect } from "wouter";
-import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { useAuth } from "./hooks/useAuth";
@@ -22,107 +20,53 @@ import Dashboard from "./pages/Dashboard";
 import SettingsPage from "./pages/SettingsPage";
 
 function AppComponent() {
-  console.log("✅ App component loaded");
-
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { isAuthenticated, isLoading } = useAuth();
 
-  const handleMenuToggle = () => setSidebarOpen(!sidebarOpen);
-  const handleSidebarClose = () => setSidebarOpen(false);
+  const toggleSidebar = () => setSidebarOpen(o => !o);
+  const closeSidebar = () => setSidebarOpen(false);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return <div>Loading…</div>;
 
   return (
-    <div
-      className="d-flex"
-      style={{
-        height: '100vh',
-        width: '100%',
-        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
-      }}
-    >
+    <>
       {isAuthenticated && (
         <>
-          {sidebarOpen && (
-            <div
-              className="position-fixed top-0 start-0 w-100 h-100"
-              style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 999 }}
-              onClick={handleSidebarClose}
-            />
-          )}
-          <MobileNavbar onMenuToggle={handleMenuToggle} />
-          <Sidebar isOpen={sidebarOpen} onClose={handleSidebarClose} />
+          {sidebarOpen && <div className="overlay" onClick={closeSidebar} />}
+          <MobileNavbar onMenuToggle={toggleSidebar} />
+          <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
         </>
       )}
 
-      <main
-        className="flex-grow-1"
-        style={{
-          marginLeft: isAuthenticated ? '280px' : '0px',
-          background: 'white',
-          overflow: 'auto',
-          minHeight: '100vh'
-        }}
-      >
-        <Switch>
-          {/* Public routes */}
-          <Route path="/" component={Home} />
-          <Route path="/login" component={LoginPage} />
-          <Route path="/register" component={RegisterPage} />
-          <Route path="/email-confirmation" component={EmailConfirmationPage} />
-
-          {/* Redirect root to /search when authenticated */}
+      <main>
+        <QueryClientProvider client={{}}>
           {isAuthenticated ? (
-  <>
-    <Route path="/" component={() => <Redirect to="/search" />} />
-
-    {/* Wrap these inside SearchProvider */}
-    <SearchProvider>
-      <Route path="/search" component={SearchPage} />
-      <Route path="/dashboard" component={Dashboard} />
-      {/* ...other routes */}
-    </SearchProvider>
-  </>
-) : (
-  /* public logic */
-)}
-
-          {/* Protected routes */}
-          {isAuthenticated && (
-            <>
-              <Route path="/search" component={SearchPage} />
-              <Route path="/dashboard" component={Dashboard} />
-              <Route path="/results" component={ResultsPage} />
-              <Route path="/signals" component={CurrentSignalsPage} />
-              <Route path="/signals/current" component={CurrentSignalsPage} />
-              <Route path="/signals/saved" component={SavedSignalsPage} />
-              <Route path="/saved" component={SavedSignalsPage} />
-              <Route path="/settings/:tab?" component={SettingsPage} />
-            </>
+            <SearchProvider>
+              <Switch>
+                {/* Redirect root to /search */}
+                <Route path="/" component={() => <Redirect to="/search" />} />
+                <Route path="/search" component={SearchPage} />
+                <Route path="/dashboard" component={Dashboard} />
+                <Route path="/results" component={ResultsPage} />
+                <Route path="/signals" component={CurrentSignalsPage} />
+                <Route path="/signals/saved" component={SavedSignalsPage} />
+                <Route path="/settings/:tab?" component={SettingsPage} />
+              </Switch>
+            </SearchProvider>
+          ) : (
+            <Switch>
+              <Route path="/" component={Home} />
+              <Route path="/login" component={LoginPage} />
+              <Route path="/register" component={RegisterPage} />
+              <Route path="/email-confirmation" component={EmailConfirmationPage} />
+              <Route component={NotFound} />
+            </Switch>
           )}
+        </QueryClientProvider>
 
-          {/* Unauthenticated catch-all */}
-          {!isAuthenticated && (
-            <Route path="*">
-              <Redirect to="/login" />
-            </Route>
-          )}
-
-          <Route component={NotFound} />
-        </Switch>
+        <Toaster />
       </main>
-
-      <Toaster />
-    </div>
+    </>
   );
 }
 
