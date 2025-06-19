@@ -33,8 +33,12 @@ const SearchPage = () => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  console.log('🔍 Submit clicked', { formData, searchType });
+  await executeSearch(searchData);
+  console.log('✅ executeSearch resolved');
+};
     
     let searchData = {
       businessIdea: '',
