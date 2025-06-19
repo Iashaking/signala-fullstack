@@ -22,6 +22,8 @@ import Dashboard from "./pages/Dashboard";
 import SettingsPage from "./pages/SettingsPage";
 
 function AppContent() {
+  console.log("✅ App component loaded");
+  
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { isAuthenticated, isLoading } = useAuth();
 
