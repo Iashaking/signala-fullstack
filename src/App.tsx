@@ -108,3 +108,4 @@ function AppContent() {
     </div>
   );
 }
+export default App;
