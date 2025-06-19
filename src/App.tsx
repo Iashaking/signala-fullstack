@@ -23,14 +23,10 @@ function AppContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { isAuthenticated, isLoading } = useAuth();
 
-  const handleMenuToggle = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
+  const handleMenuToggle = () => setSidebarOpen(!sidebarOpen);
+  const handleSidebarClose = () => setSidebarOpen(false);
 
-  const handleSidebarClose = () => {
-    setSidebarOpen(false);
-  };
-
+  // 1. Block rendering completely while auth is loading
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -43,39 +39,31 @@ function AppContent() {
   }
 
   return (
-    <div 
+    <div
       className="d-flex"
-      style={{ 
+      style={{
         height: '100vh',
         width: '100%',
         fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
       }}
     >
-      {/* Only show navigation when authenticated */}
       {isAuthenticated && (
         <>
-          {/* Sidebar overlay for mobile */}
+          {/* Mobile sidebar overlay */}
           {sidebarOpen && (
-            <div 
+            <div
               className="position-fixed top-0 start-0 w-100 h-100"
-              style={{ 
-                backgroundColor: 'rgba(0, 0, 0, 0.5)', 
-                zIndex: 999 
-              }}
+              style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 999 }}
               onClick={handleSidebarClose}
             />
           )}
 
-          {/* Mobile navbar */}
           <MobileNavbar onMenuToggle={handleMenuToggle} />
-
-          {/* Sidebar */}
           <Sidebar isOpen={sidebarOpen} onClose={handleSidebarClose} />
         </>
       )}
 
-      {/* Main content area */}
-      <main 
+      <main
         className="flex-grow-1"
         style={{
           marginLeft: isAuthenticated ? '280px' : '0px',
@@ -90,9 +78,9 @@ function AppContent() {
           <Route path="/login" component={LoginPage} />
           <Route path="/register" component={RegisterPage} />
           <Route path="/email-confirmation" component={EmailConfirmationPage} />
-          
-          {/* Protected routes - only accessible when authenticated */}
-          {isAuthenticated ? (
+
+          {/* Protected routes - only render these when authenticated */}
+          {isAuthenticated && (
             <>
               <Route path="/dashboard" component={Dashboard} />
               <Route path="/search" component={SearchPage} />
@@ -103,29 +91,20 @@ function AppContent() {
               <Route path="/saved" component={SavedSignalsPage} />
               <Route path="/settings/:tab?" component={SettingsPage} />
             </>
-          ) : (
+          )}
+
+          {/* Catch-all redirect for unauthenticated users */}
+          {!isAuthenticated && (
             <Route path="*">
               <Redirect to="/login" />
             </Route>
           )}
-          
+
           <Route component={NotFound} />
         </Switch>
       </main>
-      
+
       <Toaster />
     </div>
   );
 }
-
-function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <SearchProvider>
-        <AppContent />
-      </SearchProvider>
-    </QueryClientProvider>
-  );
-}
-
-export default App;
