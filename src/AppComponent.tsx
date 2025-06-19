@@ -21,16 +21,15 @@ import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import SettingsPage from "./pages/SettingsPage";
 
-function AppContent() {
+function AppComponent() {
   console.log("✅ App component loaded");
-  
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { isAuthenticated, isLoading } = useAuth();
 
   const handleMenuToggle = () => setSidebarOpen(!sidebarOpen);
   const handleSidebarClose = () => setSidebarOpen(false);
 
-  // 1. Block rendering completely while auth is loading
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -53,7 +52,6 @@ function AppContent() {
     >
       {isAuthenticated && (
         <>
-          {/* Mobile sidebar overlay */}
           {sidebarOpen && (
             <div
               className="position-fixed top-0 start-0 w-100 h-100"
@@ -61,7 +59,6 @@ function AppContent() {
               onClick={handleSidebarClose}
             />
           )}
-
           <MobileNavbar onMenuToggle={handleMenuToggle} />
           <Sidebar isOpen={sidebarOpen} onClose={handleSidebarClose} />
         </>
@@ -83,11 +80,16 @@ function AppContent() {
           <Route path="/register" component={RegisterPage} />
           <Route path="/email-confirmation" component={EmailConfirmationPage} />
 
-          {/* Protected routes - only render these when authenticated */}
+          {/* Redirect root to /search when authenticated */}
+          {isAuthenticated && (
+            <Route path="/" component={() => <Redirect to="/search" />} />
+          )}
+
+          {/* Protected routes */}
           {isAuthenticated && (
             <>
-              <Route path="/dashboard" component={Dashboard} />
               <Route path="/search" component={SearchPage} />
+              <Route path="/dashboard" component={Dashboard} />
               <Route path="/results" component={ResultsPage} />
               <Route path="/signals" component={CurrentSignalsPage} />
               <Route path="/signals/current" component={CurrentSignalsPage} />
@@ -97,7 +99,7 @@ function AppContent() {
             </>
           )}
 
-          {/* Catch-all redirect for unauthenticated users */}
+          {/* Unauthenticated catch-all */}
           {!isAuthenticated && (
             <Route path="*">
               <Redirect to="/login" />
@@ -113,4 +115,4 @@ function AppContent() {
   );
 }
 
-export default AppContent;
+export default AppComponent;
